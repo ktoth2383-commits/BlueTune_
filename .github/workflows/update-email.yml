@@ -1,0 +1,53 @@
+name: Frissítés-értesítő küldése (Brevo)
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Verzió (pl. 1.2.0)'
+        required: true
+      changes:
+        description: 'Újdonságok – több pontot \n-nel válassz el (pl. Új EQ preset\nGyorsabb indulás)'
+        required: true
+      mode:
+        description: 'Először mindig teszt!'
+        type: choice
+        options: [ test, send ]
+        default: test
+      test_email:
+        description: 'Teszt módban ide megy a levél'
+        required: false
+      download_url:
+        description: 'Gomb linkje (üresen: GitHub Release oldal; később a Play Áruház linkje)'
+        required: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r tools/requirements.txt
+
+      - name: Lista frissítése küldés előtt
+        if: inputs.mode == 'send'
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}
+        run: python tools/brevo_sync.py
+
+      - name: Levél
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}
+          BREVO_SENDER_EMAIL: ${{ secrets.BREVO_SENDER_EMAIL }}
+          BREVO_SENDER_NAME: ${{ secrets.BREVO_SENDER_NAME }}
+          VERSION: ${{ inputs.version }}
+          CHANGES: ${{ inputs.changes }}
+          MODE: ${{ inputs.mode }}
+          TEST_EMAIL: ${{ inputs.test_email }}
+          DOWNLOAD_URL: ${{ inputs.download_url }}
+        run: python tools/brevo_send_update.py
