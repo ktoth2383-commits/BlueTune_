@@ -1,0 +1,94 @@
+name: Android build
+
+on:
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Firebase config (opcionális – GOOGLE_SERVICES_JSON secret)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
+            printf '%s' "$GOOGLE_SERVICES_JSON" > app/google-services.json
+            echo "Firebase konfiguráció hozzáadva."
+          else
+            echo "::warning::Nincs GOOGLE_SERVICES_JSON secret – Firebase (fiók) nélkül buildelünk."
+          fi
+
+      - name: Saját aláírókulcs (opcionális – KEYSTORE_BASE64 secret)
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            echo "KEYSTORE_FILE=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
+            echo "Saját kiadási kulcs betöltve."
+          else
+            echo "::warning::Nincs KEYSTORE_BASE64 secret – a release a debug kulccsal lesz aláírva (Play-re nem tölthető fel)."
+          fi
+
+      - name: Build (APK + AAB)
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          chmod +x gradlew
+          VERSION_ARGS=""
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION_ARGS="-Pbluetune.versionName=${GITHUB_REF_NAME#v}"
+          fi
+          ./gradlew assembleDebug assembleRelease bundleRelease $VERSION_ARGS --stacktrace
+
+      - name: Kimenetek összegyűjtése + ujjlenyomat
+        run: |
+          mkdir -p dist
+          cp app/build/outputs/apk/debug/app-debug.apk dist/BlueTune-debug.apk
+          cp app/build/outputs/apk/release/app-release.apk dist/BlueTune.apk
+          cp app/build/outputs/bundle/release/app-release.aab dist/BlueTune-play.aab
+          cd dist
+          sha256sum BlueTune.apk BlueTune-play.aab > SHA256SUMS.txt
+          echo "### Ellenőrzőösszegek" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat SHA256SUMS.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          # Aláíró tanúsítvány ujjlenyomata (ezzel bárki ellenőrizheti, hogy tőled származik)
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          "$APKSIGNER" verify --print-certs BlueTune.apk | tee SIGNATURE.txt
+          echo "### Aláírás" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat SIGNATURE.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BlueTune-build
+          path: dist/*
+
+      - name: GitHub Release (csak v* tagnél)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/BlueTune.apk
+            dist/SHA256SUMS.txt
+            dist/SIGNATURE.txt
