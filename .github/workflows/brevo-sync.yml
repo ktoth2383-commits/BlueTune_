@@ -1,0 +1,28 @@
+name: Hírlevél szinkron (Firebase -> Brevo)
+
+on:
+  schedule:
+    - cron: '17 */6 * * *'   # 6 óránként
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Csak próba (nem módosít semmit)'
+        type: boolean
+        default: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r tools/requirements.txt
+      - name: Szinkron
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
+        run: python tools/brevo_sync.py
