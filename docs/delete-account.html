@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BlueTune fióktörlés</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <a class="brand" href="index.html">BLUETUNE</a>
+  <h1>Fiók és adatok törlése</h1>
+  <p>Itt az app telepítése nélkül is véglegesen törölheted a BlueTune fiókodat.</p>
+
+  <div class="card">
+    <h2 style="margin-top:0">Mi törlődik?</h2>
+    <ul>
+      <li>a fiókod (email cím, jelszó),</li>
+      <li>a felhős mentésed (presetek, eszközprofilok, beállítások),</li>
+      <li>az általad közzétett közösségi presetek,</li>
+      <li>a hírlevél-feliratkozásod (a levelezőrendszerből is, legkésőbb 24 órán belül).</li>
+    </ul>
+    <p class="muted">A törlés azonnali és nem vonható vissza. Biztonsági mentést nem őrzünk meg.
+      A telefonodon tárolt helyi beállításokat az app eltávolításával törölheted.</p>
+  </div>
+
+  <div class="card" id="form-card">
+    <form id="form" autocomplete="on">
+      <label for="email">Email cím</label>
+      <input id="email" type="email" required autocomplete="username">
+      <label for="pw">Jelszó</label>
+      <input id="pw" type="password" required autocomplete="current-password">
+      <label style="display:flex;gap:8px;align-items:center;color:var(--text)">
+        <input id="confirm" type="checkbox" style="width:auto"> Megértettem, hogy a törlés végleges.
+      </label>
+      <button id="btn" type="submit" disabled>Fiók végleges törlése</button>
+    </form>
+    <p id="status" aria-live="polite"></p>
+  </div>
+
+  <p class="muted">Elfelejtetted a jelszavad? Az appban a Bejelentkezésnél kérj újat („Elfelejtett jelszó”),
+    vagy írj nekünk az <a href="privacy.html">adatvédelmi tájékoztatóban</a> szereplő címre, és 30 napon belül töröljük a fiókodat.</p>
+
+  <footer class="muted"><a href="index.html">BlueTune</a> · <a href="privacy.html">Adatvédelem</a></footer>
+</main>
+
+<script type="module">
+  import { firebaseConfig } from "./firebase-config.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, deleteUser, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+  import { getFirestore, collection, query, where, getDocs, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+  const $ = (id) => document.getElementById(id);
+  const status = (msg, cls = "") => { $("status").textContent = msg; $("status").className = cls; };
+
+  if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+    status("Ez az oldal még nincs beállítva. Kérd a törlést emailben (lásd adatvédelmi tájékoztató).", "err");
+  } else {
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    auth.languageCode = "hu";
+    const db = getFirestore(app);
+
+    $("confirm").addEventListener("change", (e) => { $("btn").disabled = !e.target.checked; });
+
+    const messages = {
+      "auth/invalid-credential": "Hibás email cím vagy jelszó.",
+      "auth/wrong-password": "Hibás email cím vagy jelszó.",
+      "auth/user-not-found": "Hibás email cím vagy jelszó.",
+      "auth/invalid-email": "Érvénytelen email cím.",
+      "auth/too-many-requests": "Túl sok próbálkozás. Várj pár percet.",
+      "auth/network-request-failed": "Nincs internetkapcsolat.",
+    };
+
+    $("form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      $("btn").disabled = true;
+      try {
+        status("Bejelentkezés…");
+        const cred = await signInWithEmailAndPassword(auth, $("email").value.trim(), $("pw").value);
+        const uid = cred.user.uid;
+
+        status("Közzétett presetek törlése…");
+        const own = await getDocs(query(collection(db, "community_presets"), where("ownerUid", "==", uid)));
+        for (const d of own.docs) await deleteDoc(d.ref);
+
+        status("Mentés és feliratkozás törlése…");
+        await deleteDoc(doc(db, "subscribers", uid));
+        await deleteDoc(doc(db, "users", uid, "backup", "latest"));
+        await deleteDoc(doc(db, "users", uid));
+
+        status("Fiók törlése…");
+        await deleteUser(cred.user);
+
+        $("form").remove();
+        status("✓ A fiókodat és minden hozzá tartozó adatot töröltük.", "ok");
+      } catch (err) {
+        console.error(err);
+        status("Hiba: " + (messages[err.code] || err.message || "ismeretlen hiba"), "err");
+        $("btn").disabled = !$("confirm").checked;
+        try { await signOut(auth); } catch (_) {}
+      }
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BlueTune adatvédelem</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <a class="brand" href="index.html">BLUETUNE</a>
+  <h1>Adatvédelmi tájékoztató</h1>
+  <p class="muted">Hatályos: 2026. október 15-től · Verzió: 1.1</p>
+
+  <!-- KITÖLTENDŐ: a [KAPCSOLATI EMAIL] helyére írd be azt a címet, amin elérhető vagy. -->
+
+  <h2>1. Ki kezeli az adataidat?</h2>
+  <p>Adatkezelő: <strong>Tóth Kevin</strong>, a BlueTune alkalmazás fejlesztője (magánszemély, Magyarország).<br>
+    Kapcsolat: <strong>[KAPCSOLATI EMAIL]</strong></p>
+
+  <h2>2. Fiók nélkül</h2>
+  <p>Az alkalmazás fő funkciói (hangszínszabályzó, presetek, Bluetooth eszközprofilok, hangteszt) <strong>fiók nélkül</strong>
+    is működnek. Ilyenkor minden beállítás – a csatlakoztatott Bluetooth eszközök neve és címe is – kizárólag a telefonodon
+    tárolódik, és nem kerül hozzánk.</p>
+  <p>A <strong>Windows-os (asztali) BlueTune</strong> nem használ fiókot és nem küld adatot sehova: a beállításai a gépen,
+    a felhasználói mappában (<code>%APPDATA%\BlueTune</code>) tárolódnak.</p>
+
+  <h2>3. Milyen adatokat kezelünk, ha fiókot hozol létre?</h2>
+  <div class="card">
+    <table>
+      <tr><th>Adat</th><th>Cél</th><th>Jogalap</th></tr>
+      <tr><td>Email cím, jelszó (titkosítva, a Google Firebase tárolja), regisztráció és az adatvédelmi tájékoztató elfogadásának időpontja</td>
+          <td>Bejelentkezés, fiókkezelés, jelszó-visszaállítás, email-megerősítés</td>
+          <td>Szerződés teljesítése (GDPR 6. cikk (1) b)</td></tr>
+      <tr><td>Felhős mentés: saját presetek, hangbeállítások, Bluetooth eszközprofilok (eszköz neve, címe, hozzá mentett hangzás és hangerő), a telefon gyártója és típusa, a mentés időpontja</td>
+          <td>Beállítások mentése és visszaállítása – csak ha megnyomod a „Mentés” gombot</td>
+          <td>Szerződés teljesítése</td></tr>
+      <tr><td>Közösségi preset: preset neve, leírása, hangbeállítása, általad megadott becenév, kedvelések száma</td>
+          <td>Presetek nyilvános megosztása a többi felhasználóval – csak ha közzéteszed</td>
+          <td>Szerződés teljesítése</td></tr>
+      <tr><td>Hírlevél: email cím, a feliratkozás időpontja és forrása</td>
+          <td>Értesítés új verziókról és funkciókról</td>
+          <td>Hozzájárulás (GDPR 6. cikk (1) a) – bármikor visszavonható</td></tr>
+    </table>
+  </div>
+  <p>A közösségi presetek mellett <strong>csak a becenév</strong> látszik, az email címed soha.</p>
+  <p>Nem gyűjtünk: helyadatot, hangfelvételt, névjegyeket, reklámazonosítót, és nem használunk analitikát vagy hirdetéseket.
+    A hangfeldolgozás teljes egészében a telefonodon történik.</p>
+
+  <h2>4. Hírlevél (frissítés-értesítő)</h2>
+  <p>Csak akkor kapsz levelet, ha regisztrációkor vagy később a <em>Fiók → Frissítés-értesítők</em> kapcsolóval
+    kifejezetten kéred, és megerősítetted az email címed. Leiratkozni bármikor lehet: minden levél alján lévő linkkel vagy az
+    appban a kapcsolóval. Leiratkozás vagy fióktörlés után az email címed legkésőbb 24 órán belül törlődik a levelezőrendszerből.</p>
+
+  <h2>5. Kik férnek hozzá az adatokhoz? (adatfeldolgozók)</h2>
+  <ul>
+    <li><strong>Google Firebase</strong> (Google Ireland Ltd. / Google LLC) – fiókkezelés és adatbázis.</li>
+    <li><strong>Brevo</strong> (Sendinblue SAS, Franciaország) – a hírlevelek kiküldése, csak a feliratkozók email címe.</li>
+    <li><strong>GitHub</strong> (GitHub, Inc.) – az automatikus folyamat, amely a feliratkozók listáját a Brevóba szinkronizálja.</li>
+  </ul>
+  <p>Az EU-n kívüli adattovábbítás (pl. Google LLC, GitHub, Inc.) az Európai Bizottság általános szerződési feltételei, illetve az
+    EU–USA adatvédelmi keretrendszer alapján történik. Adatot nem adunk el, és harmadik félnek reklámcélra nem adunk át.</p>
+
+  <h2>6. Meddig őrizzük?</h2>
+  <ul>
+    <li>Fiók, felhős mentés, közösségi presetek: a fiók törléséig.</li>
+    <li>Hírlevél: a leiratkozásig.</li>
+  </ul>
+
+  <h2>7. Fiók és adatok törlése</h2>
+  <p>Fiókodat és minden hozzá tartozó adatot (mentés, közzétett presetek, hírlevél-feliratkozás) bármikor törölheted:</p>
+  <ul>
+    <li>az appban: <em>Fiók → Fiók végleges törlése</em>,</li>
+    <li>weben: <a href="delete-account.html">fióktörlő oldal</a>,</li>
+    <li>vagy emailben a fenti kapcsolati címen (30 napon belül teljesítjük).</li>
+  </ul>
+
+  <h2>8. Jogaid</h2>
+  <p>Kérheted az adataidhoz való hozzáférést, azok helyesbítését, törlését, kezelésük korlátozását, az adathordozhatóságot, és
+    tiltakozhatsz az adatkezelés ellen. A hozzájárulásodat bármikor visszavonhatod. Panasszal fordulhatsz a
+    <strong>Nemzeti Adatvédelmi és Információszabadság Hatósághoz</strong> (NAIH, 1055 Budapest, Falk Miksa utca 9–11.,
+    <a href="https://naih.hu">naih.hu</a>), vagy bírósághoz.</p>
+
+  <h2>9. Gyermekek</h2>
+  <p>Fiókot 16 éven felüliek hozhatnak létre. A fiók nélküli funkciókat bárki használhatja.</p>
+
+  <h2>10. Biztonság</h2>
+  <p>A kapcsolat titkosított (HTTPS/TLS). Az adatbázishoz szabályok biztosítják, hogy mindenki csak a saját adatait érje el.
+    A jelszavadat mi sem látjuk.</p>
+
+  <h2>11. Változások</h2>
+  <p>Ha a tájékoztató lényegesen változik, az appban és – feliratkozóknak – emailben is jelezzük.</p>
+
+  <footer class="muted"><a href="index.html">BlueTune</a> · <a href="delete-account.html">Fióktörlés</a></footer>
+</main>
+</body>
+</html>
