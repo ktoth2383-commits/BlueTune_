@@ -1,0 +1,61 @@
+# XcodeGen projektleírás – a GitHub Actions ebből generálja a BlueTune.xcodeproj-ot.
+# Helyben (Macen): brew install xcodegen && cd ios && xcodegen generate && open BlueTune.xcodeproj
+name: BlueTune
+
+options:
+  bundleIdPrefix: hu
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+
+packages:
+  Firebase:
+    url: https://github.com/firebase/firebase-ios-sdk
+    from: "12.0.0"
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    TARGETED_DEVICE_FAMILY: "1"
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  BlueTune:
+    type: application
+    platform: iOS
+    sources:
+      - path: BlueTune
+    info:
+      path: BlueTune/Info.plist
+      properties:
+        CFBundleDisplayName: BlueTune
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSRequiresIPhoneOS: true
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        # Háttérben is szól a zene (lezárt képernyőn is)
+        UIBackgroundModes: [audio]
+        # A Fájlok appban / a Windows-os iTunes-ban látszik a BlueTune mappája – ide másolhatsz zenét
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIUserInterfaceStyle: Dark
+        ITSAppUsesNonExemptEncryption: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: hu.bluetune
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        GENERATE_INFOPLIST_FILE: NO
+        OTHER_LDFLAGS: "$(inherited) -ObjC"
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_PREVIEWS: NO
+    dependencies:
+      - package: Firebase
+        product: FirebaseAuth
+      - package: Firebase
+        product: FirebaseFirestore

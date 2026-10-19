@@ -50,6 +50,12 @@ Kotlin + Jetpack Compose, opcionális Firebase felhővel, GitHub Actions APK-bui
 - Eszközönkénti automatikus profil (Bluetooth fejhallgató, hangszóró, monitor…), presetek telefonnal közös formátumban
 - Hangmotor: az ingyenes Equalizer APO (a Windowsnak nincs saját rendszerszintű EQ-ja)
 
+**iPhone (iOS)** – `ios/`
+- SwiftUI, a GitHub macOS-gépe buildeli (aláíratlan `.ipa`, Sideloadlyval ingyen telepíthető)
+- Saját lejátszó (az iOS nem engedi más appok hangjának módosítását) a teljes EQ-val, limiterrel, térhatással
+- Háttérben és lezárt képernyőn is szól, lezárási képernyő vezérlők, **Leállítás** gomb
+- Kimenetválasztó, eszközönkénti profil, ugyanaz a fiók / mentés / közösség / hírlevél, közös preset-formátum
+
 👉 **Teljes beállítási útmutató: [UTMUTATO.md](UTMUTATO.md)**
 
 ## APK buildelése GitHubon (Android Studio nélkül)
@@ -104,6 +110,7 @@ app/src/main/java/hu/bluetune/
 ├── model/      EqSettings, Preset, beépített presetek
 ├── service/    EqService (előtér), EqTileService, StartupReceiver, SessionReceiver
 └── ui/         MainActivity + képernyők (Hangzás, Presetek, Eszközök, Fiók, Beállítás)
+ios/            iPhone app (SwiftUI, XcodeGen: project.yml)
 desktop/        Windows app (C# WinForms): Audio/ (Core Audio, Equalizer APO), Core/ (motor, tárolás), UI/
 docs/           weboldal: adatvédelmi tájékoztató, fióktörlés (GitHub Pages)
 tools/          Brevo-szinkron és frissítés-értesítő (Python, GitHub Actions futtatja)

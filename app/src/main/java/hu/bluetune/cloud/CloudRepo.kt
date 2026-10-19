@@ -159,7 +159,9 @@ object CloudRepo {
         val own = db().collection(COMMUNITY).whereEqualTo("ownerUid", u.uid).get().await()
         own.documents.forEach { it.reference.delete().await() }
         db().collection(SUBSCRIBERS).document(u.uid).delete().await()
-        db().collection(USERS).document(u.uid).collection("backup").document("latest").delete().await()
+        for (doc in listOf("latest", "ios")) {
+            db().collection(USERS).document(u.uid).collection("backup").document(doc).delete().await()
+        }
         db().collection(USERS).document(u.uid).delete().await()
         u.delete().await()
         AppPrefs.likedCommunityIds = emptySet()

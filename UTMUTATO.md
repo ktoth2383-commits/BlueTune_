@@ -13,6 +13,7 @@ Becsült idő: 45–60 perc.
 | 6 | „Nem vírusos” igazolás | ingyenes |
 | 7 | Google Play (később) | egyszeri 25 $ |
 | 8 | Windows (.exe) | ingyenes |
+| 9 | iPhone (iOS) | build ingyenes; telepítés ingyen 7 napos, vagy 99 $/év |
 
 ---
 
@@ -254,7 +255,52 @@ ez akkor éri meg, ha sokan töltik le.
 
 ---
 
-## iOS (később)
+## 9. iPhone (iOS)
 
-Az iOS nem engedi más appok hangjának módosítását, ezért ott csak egy „társapp” készülhet (saját lejátszó + EQ + ugyanaz a fiók).
-Ehhez Apple Developer fiók kell (99 $/év). A Firebase-fiók és a Brevo-lista közös lesz, így a mostani munka ott is felhasználható.
+### Mit tud – és mit nem
+Az iOS **nem engedi**, hogy egy app más appok (Spotify, YouTube, Apple Music) hangját módosítsa, és a Bluetooth
+akkuszintet / kodeket sem adja ki. Ezért iPhone-on a BlueTune **saját lejátszóval** szól, és a te zenéidre alkalmazza
+ugyanazt a hangzást, mint Androidon:
+
+- lejátszó: zenék importálása (Fájlok app, iCloud Drive) vagy bemásolása, véletlen sorrend, ismétlés, tekerés
+- 10 sávos EQ, előerősítés, basszus, magas, Bass Boost, térhatás, balansz, hangerő-boost, **limiter**
+- **háttérben és lezárt képernyőn is szól**; a lezárási képernyőn / Vezérlőközpontban lejátszás, szünet, léptetés
+- a lejátszó fülön a **⏹ Leállítás** mindent leállít (utána az app nem fut a háttérben)
+- kimenetválasztó (Bluetooth, AirPlay, autó) és **eszközönkénti automatikus profil**
+- ugyanaz a fiók (email + jelszó), hírlevél, felhős mentés, közösségi presetek, fióktörlés
+- a presetek formátuma azonos az androidos és a windowsos appéval
+
+### Build
+Minden push után az **Actions → iOS build → Artifacts → BlueTune-ios** alatt ott a `BlueTune-unsigned.ipa`.
+A GitHub egy Macen buildeli – neked nem kell Mac.
+
+> **Publikus repónál ingyenes.** Privát repónál a GitHub a macOS-perceket tízszeres szorzóval számolja
+> (havi 2000 ingyenes percből így kb. 200 macOS-perc marad, egy build ~10–15 perc).
+
+### Firebase iOS-hez (opcionális)
+1. Firebase konzol → Projektbeállítások → *Saját alkalmazások* → **iOS app hozzáadása** → Bundle ID: `hu.bluetune`.
+2. Töltsd le a **GoogleService-Info.plist**-et.
+3. GitHub Secret: `GOOGLE_SERVICE_INFO_PLIST` = a fájl teljes tartalma (Jegyzettömbbel megnyitva).
+4. `ios/BlueTune/Config.swift`: a `siteURL` legyen ugyanaz, mint Androidon (adatvédelem + fióktörlés linkek).
+
+### Telepítés a telefonra
+
+**A) Ingyen, Windowsról – Sideloadly + ingyenes Apple ID (tesztelésre)**
+1. Telepítsd az [Apple Devices](https://apps.microsoft.com/detail/9np83lwlpz9k) (vagy iTunes) appot és a [Sideloadly](https://sideloadly.io)-t.
+2. Dugd be az iPhone-t USB-n, a telefonon fogadd el: *Megbízol ebben a számítógépben?* → Igen.
+3. Sideloadly: húzd bele a `BlueTune-unsigned.ipa`-t → írd be az Apple ID-d → **Start**.
+4. iPhone: *Beállítások → Adatvédelem és biztonság → Fejlesztői mód* → bekapcsolás (újraindul),
+   majd *Beállítások → Általános → VPN és eszközkezelés* → a saját Apple ID-d → **Megbízom**.
+5. Korlát: ingyenes Apple ID-vel az app **7 napig** fut, utána a Sideloadlyval újra kell telepíteni
+   (a beállítások és zenék megmaradnak).
+
+**B) Rendesen – Apple Developer Program (99 $/év)**
+TestFlight-on akár 10 000 tesztelőnek kiküldheted, és az App Store-ba is feltöltheted.
+Ha lesz fiókod, kiegészítem a GitHub-folyamatot aláírt buildre és automatikus TestFlight-feltöltésre
+(ehhez a tanúsítványt és az App Store Connect API-kulcsot kell majd Secretként megadni).
+
+### Zene feltöltése
+- Az appban a **+** gombbal: Fájlok app, iCloud Drive, Letöltések.
+- Vagy Fájlok app → *Saját iPhone* → **BlueTune** mappába másolás.
+- Windowsról: Apple Devices / iTunes → az iPhone → *Fájlok* → BlueTune → húzd be a zenéket.
+- Formátumok: MP3, M4A/AAC, WAV, AIFF, FLAC, ALAC (a DRM-védett Apple Music számok nem játszhatók le).

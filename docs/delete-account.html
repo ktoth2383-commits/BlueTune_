@@ -87,6 +87,7 @@
         status("Mentés és feliratkozás törlése…");
         await deleteDoc(doc(db, "subscribers", uid));
         await deleteDoc(doc(db, "users", uid, "backup", "latest"));
+        await deleteDoc(doc(db, "users", uid, "backup", "ios"));
         await deleteDoc(doc(db, "users", uid));
 
         status("Fiók törlése…");
